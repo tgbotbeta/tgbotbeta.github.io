@@ -105,6 +105,7 @@
 
         var entitylog_template = Handlebars.templates['entity_log'];
         var entitylog_html = entitylog_template({entities: entity_data});
+        $("#entitieslog").html("");
         $("#entitieslog").html(entitylog_html);
         $("#entitieslog").scrollTop($("#entitieslog").prop('scrollHeight'));
       });
