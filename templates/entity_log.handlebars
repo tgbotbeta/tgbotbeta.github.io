@@ -1,0 +1,12 @@
+{{#each entities as |entity|}}
+	{{#each entity as |e|}}
+	
+	<div style="padding: 10px; border-bottom: 1px solid #CCC">
+	 <div>
+	 	<span style="font-size: 14px; font-weight: bold; color: #666; font-size: 14px">Entity:</span> 
+	 	<span style="font-style: italic; color: #333; font-weight: bold; font-size: 16px; ">{{e.name}}</span></div>
+	 <div style="font-size: 14px;"><span style="font-weight: bold; color: #666;"">Type</span>: {{e.type}}</div>
+	</div>
+
+	{{/each}}
+{{/each}}

@@ -7,19 +7,38 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-    <title>Hello, world!</title>
+    <title>TG Bot Demo</title>
   </head>
   <body>
-    
-    <div id="chatbox"></div>
 
+    <div style="padding: 20px 40px">
+
+      <div style="margin-bottom: 20px; font-weight: bold; font-size: 18px">Group: <span style="font-weight: normal; font-style: italic" id="group_name"></span></div>
+      <div class="container-fluid" style="margin:0; paddingL 0">
+        <div class="row">
+          <div class="col-sm" style="">
+            <div style="font-weight: bold; margin-bottom: 10px">Chat Log</div>
+            <div id="chatlog" style="padding: 15px 25px; border: 1px solid #EEE; background-color: #F9F9F9; max-height: 500px; overflow-y: scroll;">
+            </div>
+          </div>
+          <div class="col-sm" style="">
+            <div style="font-weight: bold; margin-bottom: 10px">Entities Found</div>
+            <div id="entitieslog" style="padding: 15px 25px; border: 1px solid #EEE; background-color: #ECF1FA; max-height: 500px; overflow-y: scroll;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script src="./tg.js"></script>
+
 
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/6.5.0/firebase-app.js"></script>
@@ -28,6 +47,10 @@
      https://firebase.google.com/docs/web/setup#config-web-app -->
     <script src="https://www.gstatic.com/firebasejs/6.5.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/6.5.0/firebase-firestore.js"></script>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <script src="templates/chat_log.js"></script>
+    <script src="templates/entity_log.js"></script>
 
     <script>
       // Your web app's Firebase configuration
@@ -42,6 +65,52 @@
       };
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
+
+      var db = firebase.firestore();
+      //var docRef = db.collectionGroup('message').where('chat.id', '==', "-273871975");
+      //var docRef = db.collection('tg-msgs');
+
+      var group_id = $.getUrlVar('id');
+      var chat_data = [];
+      var entity_data = [];
+      var group_name = "";
+
+      var docRef = db.collection('tg-groups').doc(group_id).collection('messages');
+      docRef.onSnapshot(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+            // doc.data() is never undefined for query doc snapshots
+            //console.log(doc.id, " => ", doc.data());
+            chat_data.push(doc.data());
+
+        });
+        group_name = chat_data[0].message.chat.title;
+        $("#group_name").text(group_name);
+        var chatlog_template = Handlebars.templates['chat_log'];
+        var chatlog_html = chatlog_template({messages: chat_data});
+        $("#chatlog").html(chatlog_html);
+        $("#chatlog").scrollTop($("#chatlog").prop('scrollHeight'));
+      })
+
+      var entRef = db.collection('tg-entities').doc(group_id).collection('entities');
+      entRef.onSnapshot(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+            // doc.data() is never undefined for query doc snapshots
+            //console.log(doc.id, " => ", JSON.stringify(doc.data().entities));
+            entity_data.push(doc.data().entities);
+
+        });
+        console.log(JSON.stringify(entity_data[0]));
+
+        var entitylog_template = Handlebars.templates['entity_log'];
+        var entitylog_html = entitylog_template({entities: entity_data});
+        $("#entitieslog").html(entitylog_html);
+        $("#entitieslog").scrollTop($("#entitieslog").prop('scrollHeight'));
+      });
+
+      //var chat_html = Handlebars.templates.chat_log(chat_data);
+
+      //alert(chat_html);
+
     </script>
 
   </body>
