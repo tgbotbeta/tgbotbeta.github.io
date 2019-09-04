@@ -3,7 +3,7 @@
 templates['chat_log'] = template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression;
 
-  return "\n<div style=\"margin-bottom: 10px\">\n <div style=\"font-size: 10px; font-weight: bold; color: #2381CC\">"
+  return "\n<div style=\"margin-bottom: 10px\">\n <div style=\"font-size: 12px; font-weight: bold; color: #2381CC\">"
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.message : depth0)) != null ? stack1.from : stack1)) != null ? stack1.first_name : stack1), depth0))
     + " "
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.message : depth0)) != null ? stack1.from : stack1)) != null ? stack1.last_name : stack1), depth0))
