@@ -1,0 +1,15 @@
+.MyCustomSearchBox {
+    text-align: center;
+}
+.MyCustomSearchBoxForm {
+    width: 600px;
+    margin: 0 auto;
+}
+.MyCustomSearchInput {
+    width: 500px;
+    size: 400;
+}
+.MyCustomSearchReset {
+    margin: 0 10px;
+    size: 30px;
+}

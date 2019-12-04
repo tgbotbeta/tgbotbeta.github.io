@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@7.3.1/themes/reset-min.css" integrity="sha256-t2ATOGCtAIZNnzER679jwcFcKYfLlw01gli6F6oszk8=" crossorigin="anonymous">
+    <link rel="stylesheet" href="search.css">
+    <script src="https://kit.fontawesome.com/ef293947d9.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
+    <title>Message Search</title>
+  </head>
+  <body style="font-family: 'Lato', sans-serif;">
+    <div id="searchbox" style="text-align: center; margin: 20px 20px;"></div>
+
+    <div id="hits" style="margin: 0px 60px"></div>
+
+    <div id="tgModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Open Telegram</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>To find the chat group, hit 'Go' below,<br>And search for '<span style="font-weight: bold; font-size: 22px" id='chat_id_search'></span>' in the Telegram app.</p>
+            </div>
+            <div class="modal-footer">
+                <a href="tg://">
+                    <button id="tgClose" onclick="$('#tgModal').modal('hide')" type="button" class="btn btn-secondary">Go</button>
+                </a>
+            </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  
+    <script src="https://cdn.jsdelivr.net/npm/algoliasearch@3.35.1/dist/algoliasearchLite.min.js" integrity="sha256-5rOQwvvJdM9oDYQYCGzaJuuTy6SUALjma3OtzEGyJM0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.0.0/dist/instantsearch.production.min.js" integrity="sha256-6S7q0JJs/Kx4kb/fv0oMjS855QTz5Rc2hh9AkIUjUsk=" crossorigin="anonymous"></script>
+
+    <script>
+        const searchClient = algoliasearch('2E5Y9IVKUA', '7b4870dace009bd148a7c748837b6fac');
+
+        const search = instantsearch({
+            indexName: 'bot',
+            searchClient,
+        });
+
+        search.addWidgets([
+            instantsearch.widgets.searchBox({
+                container: '#searchbox',
+                placeholder: 'Search your message threads',
+                showSubmit: false,
+                cssClasses: {
+                    root: 'MyCustomSearchBox',
+                    form: [
+                        'MyCustomSearchBoxForm',
+                        'MyCustomSearchBoxForm--subclass',
+                    ],
+                    input: [
+                        'MyCustomSearchInput'
+                    ],
+                    resetIcon: [
+                        'MyCustomSearchReset'
+                    ],
+                },  
+        }),
+
+        instantsearch.widgets.hits({
+                container: '#hits',
+                templates: {
+                    empty: 'No results for <q>{{ query }}</q>',
+                    item: `
+                    <div style="margin: 10px 80px">
+                        <div class="container-fluid" style="vertical-align: middle;">
+                            <div class="row" style="">
+                                <div class="col-11" style="margin: 0; padding: 0; text-align: left; vertical-align: top; font-size: 20px;">
+                                    <i class="fab fa-telegram" style="color: #30A8DE"></i>
+                                    <span style="color: #666; font-size: 14px; margin-left: 5px">Group: </span> <span style="font-size: 14px; font-weight: bold">{{#helpers.highlight}}{ "attribute": "chat_title" }{{/helpers.highlight}}</span>
+                                </div> 
+                                <div class="col-1" style="color: #CCC; font-size: 16px;">
+                                    <a href="#" onclick="openTG('{{ chat_id }}')"><i class="fas fa-external-link"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="font-size: 15px; padding-bottom: 15px; border-bottom: 1px solid #CCC">
+                                {{#helpers.highlight}}{ "attribute": "message" }{{/helpers.highlight}}
+                        </div>
+                    </div>
+                    `
+                    //item: `<div>
+                    //        {{#helpers.highlight}}{ "attribute": "message" }{{/helpers.highlight}}
+                    //       </div>`,
+                },
+            })
+        ]);
+
+        function openTG(chat_id) {
+            $('#chat_id_search').text(chat_id);
+            $('#tgModal').modal('show');
+        }
+
+        search.start();
+    </script>
+
+  </body>
+</html>
